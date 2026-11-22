@@ -75,10 +75,26 @@ JavaScript.
 
 ## Deploying
 
-1. Import this repository into Vercel.
-2. Add `WEATHERAPI_KEY` under **Project → Settings → Environment Variables** for
-   Production, Preview and Development.
-3. Deploy. Every push to `main` triggers a new production deployment.
+The production project is `weatherfirst` on Vercel and is live at
+**https://weatherfirst-six.vercel.app**.
+
+1. Add `WEATHERAPI_KEY` under **Project → Settings → Environment Variables** for
+   Production, Preview and Development (already configured for the live project).
+2. Deploy with `vercel deploy --prod`, or connect the repository under
+   **Project → Settings → Git** to let Vercel deploy every push automatically.
+
+### Automatic deployment from GitHub
+
+`.github/workflows/deploy.yml` deploys to production on every push to `main`.
+It needs a repository secret named `VERCEL_TOKEN`:
+
+1. Open **Settings → Secrets and variables → Actions → New repository secret**.
+2. Name it `VERCEL_TOKEN` and paste a Vercel access token.
+3. Push to `main` (or run the workflow manually). Until the secret exists the
+   workflow skips the deploy and leaves a notice instead of failing.
+
+Alternatively, connect the GitHub repository in the Vercel project settings;
+Vercel's native Git integration then deploys on push without a secret.
 
 ## Project structure
 
