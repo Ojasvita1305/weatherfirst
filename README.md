@@ -85,16 +85,21 @@ The production project is `weatherfirst` on Vercel and is live at
 
 ### Automatic deployment from GitHub
 
-`.github/workflows/deploy.yml` deploys to production on every push to `main`.
-It needs a repository secret named `VERCEL_TOKEN`:
+Automatic deployment needs one dashboard step that cannot be done through an
+API token: the Vercel account has no GitHub login connection yet, so the project
+cannot be linked to this repository over the API.
 
-1. Open **Settings → Secrets and variables → Actions → New repository secret**.
-2. Name it `VERCEL_TOKEN` and paste a Vercel access token.
-3. Push to `main` (or run the workflow manually). Until the secret exists the
-   workflow skips the deploy and leaves a notice instead of failing.
+To enable it:
 
-Alternatively, connect the GitHub repository in the Vercel project settings;
-Vercel's native Git integration then deploys on push without a secret.
+1. Sign in to Vercel with GitHub (or add GitHub under
+   **Account Settings → Authentication**) so Vercel can read the repository.
+2. Open the `weatherfirst` project → **Settings → Git** → **Connect Git
+   Repository** and choose `Ojasvita1305/weatherfirst`.
+3. Leave the production branch as `main`. Every push then triggers a
+   production deployment.
+
+Until that connection exists, deploys are run from the command line with
+`vercel deploy --prod`.
 
 ## Project structure
 
