@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1f3a" />
+  <meta name="description" content="WeatherFirst — realtime weather, a 7-day forecast, air quality and weather maps in one lightweight app." />
+  <meta property="og:title" content="WeatherFirst" />
+  <meta property="og:description" content="Know the sky, the air and the week ahead before you step out." />
+  <meta property="og:type" content="website" />
+  <title>WeatherFirst — sky, air and the week ahead</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1f3a'/%3E%3Ccircle cx='26' cy='25' r='10' fill='%23fbbf24'/%3E%3Cpath d='M19 44c0-6 4.7-10 10.6-10 1 0 1.9.1 2.8.4C34.8 30.6 38.6 28 43 28c6.1 0 11 4.7 11 10.5S49.1 49 43 49H24c-2.8 0-5-2.2-5-5z' fill='%23e2e8f0'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <div class="offline-banner" id="offline-banner" role="status" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 2l20 20M8.5 16.5a4.5 4.5 0 015.7-4.3M5 12.5a8 8 0 0110.3-3.7M2.5 8.5A12 12 0 0114 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span>You appear to be offline. Showing the last successful data, marked as stale.</span>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#weather" aria-label="WeatherFirst home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <circle cx="25" cy="24" r="10" fill="#fbbf24" />
+            <path d="M17 45c0-6.1 4.9-11 11-11 1 0 2 .1 2.9.4C32.9 31.1 36.8 29 41 29c6.1 0 11 4.9 11 11s-4.9 11-11 11H22c-2.8 0-5-2.2-5-5z" fill="#e8f1ff" />
+            <path d="M22 39h18" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round" opacity=".55" />
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>WeatherFirst</strong>
+          <small>sky · air · week</small>
+        </span>
+      </a>
+
+      <div class="search" id="search">
+        <form class="search-form" id="search-form" role="search" novalidate>
+          <label class="sr-only" for="city-input">Search for a city</label>
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M16 16l4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          </span>
+          <input
+            id="city-input"
+            name="city"
+            type="text"
+            inputmode="search"
+            autocomplete="off"
+            autocapitalize="words"
+            spellcheck="false"
+            placeholder="Search any city…"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="suggestions"
+            aria-describedby="search-hint"
+          />
+          <button class="btn btn-search" type="submit">Search</button>
+        </form>
+        <ul class="suggestions" id="suggestions" role="listbox" aria-label="City suggestions" hidden></ul>
+        <p class="search-hint" id="search-hint" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-ghost locate-btn" id="locate-btn" type="button">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s7-5.1 7-11a7 7 0 10-14 0c0 5.9 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+          </span>
+          <span class="locate-label">Use my location</span>
+        </button>
+        <div class="unit-toggle" role="group" aria-label="Temperature unit">
+          <button type="button" data-unit="c" aria-pressed="true">°C</button>
+          <button type="button" data-unit="f" aria-pressed="false">°F</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chips-row">
+      <div class="chips" id="city-chips" aria-label="Popular cities"></div>
+    </div>
+  </header>
+
+  <main class="page" id="main">
+    <section class="city-head" aria-live="polite">
+      <div class="city-head-main">
+        <p class="eyebrow">Selected city</p>
+        <h1 id="city-name">Mumbai</h1>
+        <p class="city-meta" id="city-meta">Maharashtra, India</p>
+      </div>
+      <div class="city-clock">
+        <p class="eyebrow">Local time</p>
+        <p id="local-time">—</p>
+      </div>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Weather views" id="tabs">
+      <button class="tab is-active" id="tab-weather" role="tab" aria-selected="true" aria-controls="panel-weather" tabindex="0">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <span>Weather</span>
+      </button>
+      <button class="tab" id="tab-air" role="tab" aria-selected="false" aria-controls="panel-air" tabindex="-1">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 8h11.5a2.5 2.5 0 10-2.5-2.5M3 12h15.5a2.5 2.5 0 11-2.5 2.5M3 16h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <span>Air Quality</span>
+        <span class="tab-badge" id="tab-aqi" hidden></span>
+      </button>
+      <button class="tab" id="tab-maps" role="tab" aria-selected="false" aria-controls="panel-maps" tabindex="-1">
+        <span class="tab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M9 4.5L3.5 6.8v13L9 17.5l6 2.3 5.5-2.3v-13L15 6.8 9 4.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 4.5v13M15 6.8v13" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+        </span>
+        <span>Maps</span>
+      </button>
+    </div>
+
+    <section class="panel" id="panel-weather" role="tabpanel" aria-labelledby="tab-weather" tabindex="0">
+      <div class="weather-grid">
+        <div id="current-section" class="current-section"></div>
+        <div id="forecast-section" class="forecast-section"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-air" role="tabpanel" aria-labelledby="tab-air" tabindex="0" hidden>
+      <div id="air-section"></div>
+    </section>
+
+    <section class="panel panel-maps" id="panel-maps" role="tabpanel" aria-labelledby="tab-maps" tabindex="0" hidden>
+      <div id="map-section"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand"><strong>WeatherFirst</strong> <span>v1.1 · MVP</span></p>
+      <p class="footer-sources">
+        Current conditions by <a href="https://www.weatherapi.com/" target="_blank" rel="noopener">WeatherAPI.com</a>.
+        Forecast and air quality by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.
+        Maps © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors.
+      </p>
+      <p class="footer-note">Recommendations are app-generated suggestions, not official weather or health advisories.</p>
+    </div>
+  </footer>
+
+  <details class="dev-panel" id="dev-panel">
+    <summary>
+      <span>Developer data viewer</span>
+      <span class="dev-hint">raw API responses</span>
+      <svg class="dev-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="dev-body">
+      <div class="dev-controls">
+        <div class="segmented" role="tablist" aria-label="Data source">
+          <button type="button" role="tab" data-source="current" aria-selected="true">Current</button>
+          <button type="button" role="tab" data-source="forecast" aria-selected="false">Forecast</button>
+          <button type="button" role="tab" data-source="air" aria-selected="false">Air quality</button>
+        </div>
+        <div class="segmented" role="group" aria-label="JSON view">
+          <button type="button" data-view="formatted" aria-pressed="true">Formatted</button>
+          <button type="button" data-view="raw" aria-pressed="false">Raw</button>
+        </div>
+        <button type="button" class="btn btn-ghost btn-copy" id="copy-json">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 16V6a2 2 0 012-2h8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Copy JSON
+        </button>
+      </div>
+      <pre id="json-output" tabindex="0">No data yet. Data appears here after a successful API request.</pre>
+    </div>
+  </details>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
