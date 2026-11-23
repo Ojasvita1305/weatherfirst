@@ -42,6 +42,7 @@ export const POPULAR_CITIES = Object.freeze([
 export const API = Object.freeze({
   proxy: '/api/weather',
   geocode: 'https://geocoding-api.open-meteo.com/v1/search',
+  reverseGeocode: 'https://nominatim.openstreetmap.org/reverse',
   forecast: 'https://api.open-meteo.com/v1/forecast',
   airQuality: 'https://air-quality-api.open-meteo.com/v1/air-quality',
 });

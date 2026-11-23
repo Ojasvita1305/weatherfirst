@@ -422,6 +422,60 @@ export async function searchCities(query, signal) {
   return normaliseSearch(data);
 }
 
+/**
+ * Reverse geocoding is only used to label the coordinates returned by the
+ * Geolocation API. WeatherAPI resolves the nearest station, which can be a
+ * village or locality (for example "Samardha Kaliyasot" next to Bhopal), so
+ * ask OpenStreetMap for the administrative address and prefer city-level
+ * names over suburb/locality names.
+ */
+const CITY_NAME_FIELDS = [
+  'city',
+  'town',
+  'municipality',
+  'state_district',
+  'county',
+  'village',
+  'suburb',
+  'city_district',
+];
+
+function pickCityName(address) {
+  if (!address || typeof address !== 'object') return null;
+  for (const field of CITY_NAME_FIELDS) {
+    const value = address[field];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return null;
+}
+
+export async function reverseGeocode(lat, lon, signal) {
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+
+  const url = new URL(API.reverseGeocode);
+  url.searchParams.set('format', 'jsonv2');
+  url.searchParams.set('lat', lat.toFixed(5));
+  url.searchParams.set('lon', lon.toFixed(5));
+  url.searchParams.set('zoom', '18');
+  url.searchParams.set('addressdetails', '1');
+  url.searchParams.set('accept-language', 'en');
+
+  const { data } = await fetchJson(url.toString(), { signal, timeoutMs: 6000 });
+  const address = data && data.address;
+  const name = pickCityName(address);
+  if (!name) return null;
+
+  return {
+    name,
+    region: address.state || address.state_district || '',
+    country: address.country || '',
+    countryCode: String(address.country_code || '').toUpperCase(),
+    lat,
+    lon,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+  };
+}
+
 export async function getMapGrid(city, signal) {
   const size = MAP_GRID_SIZE;
   const latSpan = MAP_GRID_LAT_SPAN;

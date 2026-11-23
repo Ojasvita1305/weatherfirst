@@ -1,5 +1,12 @@
 import { DEFAULT_CITY, POPULAR_CITIES, SOURCES, STORAGE_KEYS, TABS } from './config.js';
-import { getAirQuality, getCurrent, getForecast, getMapGrid, invalidate } from './api.js';
+import {
+  getAirQuality,
+  getCurrent,
+  getForecast,
+  getMapGrid,
+  invalidate,
+  reverseGeocode,
+} from './api.js';
 import { getAqiCategory } from './interpretation.js';
 import { STRINGS } from './strings.js';
 import {
@@ -634,8 +641,20 @@ function setUnit(unit) {
   syncMapContext({ unit: next });
 }
 
-function useLocation(coords) {
-  const provisional = {
+async function useLocation(coords) {
+  // Resolve a city-level label before loading. Without this the label falls
+  // back to WeatherAPI's nearest station, which may be a village or suburb.
+  header?.setLocating(true);
+  let resolved = null;
+  try {
+    resolved = await reverseGeocode(coords.lat, coords.lon);
+  } catch {
+    resolved = null;
+  } finally {
+    header?.setLocating(false);
+  }
+
+  const city = resolved || {
     name: STRINGS.location.provisionalName,
     region: '',
     country: '',
@@ -644,7 +663,7 @@ function useLocation(coords) {
     lon: coords.lon,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
   };
-  loadCity(provisional, { reason: 'location' });
+  loadCity(city, { reason: 'location' });
 }
 
 function locationError(message) {
