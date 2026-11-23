@@ -78,28 +78,17 @@ JavaScript.
 The production project is `weatherfirst` on Vercel and is live at
 **https://weatherfirst-six.vercel.app**.
 
-1. Add `WEATHERAPI_KEY` under **Project → Settings → Environment Variables** for
-   Production, Preview and Development (already configured for the live project).
-2. Deploy with `vercel deploy --prod`, or connect the repository under
-   **Project → Settings → Git** to let Vercel deploy every push automatically.
+- `WEATHERAPI_KEY` is configured under **Project → Settings → Environment
+  Variables** for Production, Preview and Development.
+- The project is linked to `Ojasvita1305/weatherfirst` through the Vercel Git
+  integration, so **every push to `main` deploys to production automatically**.
+- Manual deploys still work with `vercel deploy --prod`.
 
 ### Automatic deployment from GitHub
 
-Automatic deployment needs one dashboard step that cannot be done through an
-API token: the Vercel account has no GitHub login connection yet, so the project
-cannot be linked to this repository over the API.
-
-To enable it:
-
-1. Sign in to Vercel with GitHub (or add GitHub under
-   **Account Settings → Authentication**) so Vercel can read the repository.
-2. Open the `weatherfirst` project → **Settings → Git** → **Connect Git
-   Repository** and choose `Ojasvita1305/weatherfirst`.
-3. Leave the production branch as `main`. Every push then triggers a
-   production deployment.
-
-Until that connection exists, deploys are run from the command line with
-`vercel deploy --prod`.
+The repository is connected, and the production branch is `main`. A push to
+`main` creates a production deployment; other branches create preview
+deployments. No Actions secret or deploy hook is required.
 
 ## Project structure
 
